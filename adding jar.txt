@@ -254,5 +254,26 @@ object HudiTest {
 }
 
 
+import org.apache.hudi.DataSourceWriteOptions._
+import org.apache.hudi.config.HoodieWriteConfig._
+import org.apache.spark.sql.SaveMode
+
+val tableName = "hudi_test_table"
+val basePath = "file:///tmp/hudi_test_table"
+
+val data = Seq(
+  (1, "Alice", 24),
+  (2, "Bob", 30),
+  (3, "Cathy", 27)
+)
+
+val df = spark.createDataFrame(data).toDF("id", "name", "age")
+
+df.write.format("hudi")
+  .option(TABLE_NAME, tableName)
+  .option(RECORDKEY_FIELD_OPT_KEY, "id")
+  .option(PRECOMBINE_FIELD_OPT_KEY, "age")
+  .mode(SaveMode.Overwrite)
+  .save(basePath)
 
 

@@ -282,3 +282,15 @@ df.write.format("hudi")
 ./spark-shell --jars /opt/hudi/hudi-spark3.1.2-bundle_2.12-0.10.1.jar \
               --conf spark.serializer=org.apache.spark.serializer.KryoSerializer \
               --conf spark.sql.hive.convertMetastoreParquet=false
+
+
+CREATE EXTERNAL TABLE hudi_hive_table(
+    id INT,
+    name STRING,
+    age INT
+)
+STORED BY 'org.apache.hudi.hadoop.HoodieParquetInputFormat'
+LOCATION 'file:///tmp/hudi_test_table';
+
+SELECT * FROM hudi_hive_table;
+

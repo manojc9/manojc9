@@ -121,3 +121,41 @@ object HudiTest {
 
 
 
+import org.apache.spark.sql.SparkSession
+import org.apache.spark.sql.SaveMode
+import org.apache.hudi.DataSourceWriteOptions
+
+object HudiTest {
+  def main(args: Array[String]): Unit = {
+
+    // Create Spark session
+    val spark = SparkSession.builder()
+      .appName("Hudi Test")
+      .config("spark.serializer", "org.apache.spark.serializer.KryoSerializer")
+      .config("spark.jars", "/opt/hudi/hudi-spark-bundle.jar")  // Specify Hudi jar
+      .getOrCreate()
+
+    // Sample data
+    val data = Seq(
+      (1, "Alice", "2023-09-17T12:00:00Z"),
+      (2, "Bob", "2023-09-17T12:05:00Z")
+    )
+
+    // Create DataFrame
+    val df = spark.createDataFrame(data).toDF("id", "name", "ts")
+
+    // Write Data to Hudi table using string keys instead of ConfigProperty
+    df.write.format("hudi")
+      .option("hoodie.table.name", "hudi_table_test")  // Use string key instead of ConfigProperty
+      .option("hoodie.datasource.write.recordkey.field", "id")  // Use string key
+      .option("hoodie.datasource.write.precombine.field", "ts")  // Use string key
+      .mode(SaveMode.Append)
+      .save("hdfs://localhost:9000/user/hudi_table_test")
+
+    // Stop the Spark session
+    spark.stop()
+  }
+}
+
+
+

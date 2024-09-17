@@ -221,3 +221,38 @@ SELECT * FROM hudi_table;
 
 
 
+import org.apache.hudi.DataSourceWriteOptions // Import only DataSourceWriteOptions
+import org.apache.spark.sql.SaveMode
+
+object HudiTest {
+  def main(args: Array[String]): Unit = {
+
+    // Create Spark session
+    val spark = SparkSession.builder()
+      .appName("Hudi Test")
+      .config("spark.serializer", "org.apache.spark.serializer.KryoSerializer")
+      .config("spark.jars", "/opt/hudi/hudi-spark-bundle.jar")  // Specify Hudi jar
+      .getOrCreate()
+
+    // Sample data
+    val dataGen = spark.range(0, 1000).toDF("id")
+
+    // Write data to Hudi table using qualified references to avoid ambiguity
+    dataGen.write.format("hudi")
+      .option(DataSourceWriteOptions.TABLE_NAME.key(), "hudi_table_test")  // Fully qualified reference
+      .option(DataSourceWriteOptions.PRECOMBINE_FIELD.key(), "id")         // Fully qualified reference
+      .option(DataSourceWriteOptions.RECORDKEY_FIELD.key(), "id")          // Fully qualified reference
+      .option(DataSourceWriteOptions.PARTITIONPATH_FIELD.key(), "")        // Fully qualified reference
+      .option(DataSourceWriteOptions.OPERATION.key(), "insert")            // Fully qualified reference
+      .option(DataSourceWriteOptions.TABLE_TYPE.key(), "COPY_ON_WRITE")    // Fully qualified reference
+      .mode(SaveMode.Overwrite)                                            // Overwrite existing data
+      .save("hdfs://localhost:9000/user/hudi/hudi_table_test")             // Save to HDFS
+
+    // Stop the Spark session
+    spark.stop()
+  }
+}
+
+
+
+

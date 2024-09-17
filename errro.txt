@@ -1,44 +1,5 @@
-scala> 
-
-scala> val df = spark.createDataFrame(data).toDF("id", "first_name", "last_name")
-<console>:40: error: value createDataFrame is not a member of org.apache.spark.sql.SparkSession.Builder
-       val df = spark.createDataFrame(data).toDF("id", "first_name", "last_name")
-                      ^
-
-scala> 
-
-scala> df.write.format("hudi")
-res10: org.apache.spark.sql.DataFrameWriter[org.apache.spark.sql.Row] = org.apache.spark.sql.DataFrameWriter@3d2bcab9
-
-scala>   .option(TABLE_TYPE_OPT_KEY, "COPY_ON_WRITE")
-res11: org.apache.spark.sql.DataFrameWriter[org.apache.spark.sql.Row] = org.apache.spark.sql.DataFrameWriter@3d2bcab9
-
-scala>   .option(PRECOMBINE_FIELD_OPT_KEY, "id")
-res12: org.apache.spark.sql.DataFrameWriter[org.apache.spark.sql.Row] = org.apache.spark.sql.DataFrameWriter@3d2bcab9
-
-scala>   .option(RECORDKEY_FIELD_OPT_KEY, "id")
-res13: org.apache.spark.sql.DataFrameWriter[org.apache.spark.sql.Row] = org.apache.spark.sql.DataFrameWriter@3d2bcab9
-
-scala>   .option(PARTITIONPATH_FIELD_OPT_KEY, "")
-res14: org.apache.spark.sql.DataFrameWriter[org.apache.spark.sql.Row] = org.apache.spark.sql.DataFrameWriter@3d2bcab9
-
-scala>   .option(HoodieWriteConfig.TBL_NAME, "test_hudi_table")
-<console>:40: error: overloaded method value option with alternatives:
-  (key: String,value: Double)org.apache.spark.sql.DataFrameWriter[org.apache.spark.sql.Row] <and>
-  (key: String,value: Long)org.apache.spark.sql.DataFrameWriter[org.apache.spark.sql.Row] <and>
-  (key: String,value: Boolean)org.apache.spark.sql.DataFrameWriter[org.apache.spark.sql.Row] <and>
-  (key: String,value: String)org.apache.spark.sql.DataFrameWriter[org.apache.spark.sql.Row]
- cannot be applied to (org.apache.hudi.common.config.ConfigProperty[String], String)
-       res14  .option(HoodieWriteConfig.TBL_NAME, "test_hudi_table")
-               ^
-
-scala>   .mode("overwrite")
-res16: org.apache.spark.sql.DataFrameWriter[org.apache.spark.sql.Row] = org.apache.spark.sql.DataFrameWriter@3d2bcab9
-
-scala>   .save("/tmp/hudi_test")
-org.apache.hudi.exception.HoodieException: 'hoodie.table.name' must be set.
-  at org.apache.hudi.common.config.HoodieConfig.getStringOrThrow(HoodieConfig.java:260)
-  at org.apache.hudi.HoodieSparkSqlWriter$.writeInternal(HoodieSparkSqlWriter.scala:185)
+org.apache.hudi.exception.HoodieException: hoodie only support org.apache.spark.serializer.KryoSerializer as spark.serializer
+  at org.apache.hudi.HoodieSparkSqlWriter$.writeInternal(HoodieSparkSqlWriter.scala:193)
   at org.apache.hudi.HoodieSparkSqlWriter$.write(HoodieSparkSqlWriter.scala:132)
   at org.apache.hudi.DefaultSource.createRelation(DefaultSource.scala:150)
   at org.apache.spark.sql.execution.datasources.SaveIntoDataSourceCommand.run(SaveIntoDataSourceCommand.scala:47)
@@ -70,7 +31,4 @@ org.apache.hudi.exception.HoodieException: 'hoodie.table.name' must be set.
   at org.apache.spark.sql.DataFrameWriter.saveToV1Source(DataFrameWriter.scala:382)
   at org.apache.spark.sql.DataFrameWriter.saveInternal(DataFrameWriter.scala:355)
   at org.apache.spark.sql.DataFrameWriter.save(DataFrameWriter.scala:239)
-  ... 55 elided
-
-scala> 
-
+  ... 40 elided

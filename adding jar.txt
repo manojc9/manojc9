@@ -1,5 +1,7 @@
-spark-shell --jars /path/to/hudi-spark-bundle.jar,/path/to/hive-exec.jar,/path/to/hadoop-common.jar \
-  --conf spark.serializer=org.apache.spark.serializer.KryoSerializer
+
+
+spark.jars /opt/hudi/hudi-spark-bundle.jar,/opt/hadoop/share/hadoop/hdfs/lib/hadoop-aws-3.2.0.jar,/usr/local/hive/lib/hive-exec.jar
+spark.serializer org.apache.spark.serializer.KryoSerializer
 
 
 

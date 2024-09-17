@@ -3,6 +3,41 @@
 spark.jars /opt/hudi/hudi-spark-bundle.jar,/opt/hadoop/share/hadoop/hdfs/lib/hadoop-aws-3.2.0.jar,/usr/local/hive/lib/hive-exec.jar
 spark.serializer org.apache.spark.serializer.KryoSerializer
 
+CREATE EXTERNAL TABLE hudi_table (
+  id STRING,
+  name STRING,
+  ts TIMESTAMP
+)
+STORED AS PARQUET
+LOCATION 'hdfs://localhost:9000/user/hudi_table';
+
+
+libraryDependencies += "org.apache.hudi" %% "hudi-spark-bundle" % "0.9.0"
+
+
+import org.apache.spark.sql.SparkSession
+import org.apache.hudi.DataSourceWriteOptions._
+import org.apache.hudi.config.HoodieWriteConfig._
+import org.apache.spark.sql.SaveMode
+
+val spark = SparkSession.builder()
+  .appName("Hudi Test")
+  .config("spark.serializer", "org.apache.spark.serializer.KryoSerializer")
+  .getOrCreate()
+
+val data = Seq((1, "Alice", "2023-09-17T12:00:00Z"),
+               (2, "Bob", "2023-09-17T12:05:00Z"))
+
+val df = spark.createDataFrame(data).toDF("id", "name", "ts")
+
+df.write.format("hudi")
+  .option(TABLE_NAME, "hudi_table")
+  .option(RECORDKEY_FIELD_OPT_KEY, "id")
+  .option(PRECOMBINE_FIELD_OPT_KEY, "ts")
+  .mode(SaveMode.Append)
+  .save("hdfs://localhost:9000/user/hudi_table")
+
+
 
 
 spark-shell --conf "spark.executor.extraJavaOptions=-Dlog4j.configuration=file:/path/to/log4j.properties"

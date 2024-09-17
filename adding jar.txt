@@ -1,2 +1,6 @@
 spark-shell --jars /path/to/hudi-spark-bundle.jar,/path/to/hive-exec.jar,/path/to/hadoop-common.jar \
   --conf spark.serializer=org.apache.spark.serializer.KryoSerializer
+
+
+
+spark-shell --conf "spark.executor.extraJavaOptions=-Dlog4j.configuration=file:/path/to/log4j.properties"

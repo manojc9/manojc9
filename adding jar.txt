@@ -147,7 +147,8 @@ object HudiTest {
     // Write Data to Hudi table using string keys instead of ConfigProperty
     df.write.format("hudi")
       .option("hoodie.table.name", "hudi_table_test")  // Use string key instead of ConfigProperty
-      .option("hoodie.datasource.write.recordkey.field", "id")  // Use string key
+      .option("hoodie.datas
+ource.write.recordkey.field", "id")  // Use string key
       .option("hoodie.datasource.write.precombine.field", "ts")  // Use string key
       .mode(SaveMode.Append)
       .save("hdfs://localhost:9000/user/hudi_table_test")
@@ -156,6 +157,67 @@ object HudiTest {
     spark.stop()
   }
 }
+
+
+
+
+
+Step 5: Integrating Apache Hudi with Spark
+5.1 Add Hudi Dependencies to Spark:
+Use the following command to start Spark Shell with Hudi support:
+$SPARK_HOME/bin/spark-shell \
+--packages org.apache.hudi:hudi-spark3.3-bundle_2.12:0.13.0 \
+--conf "spark.serializer=org.apache.spark.serializer.KryoSerializer" \
+--conf "spark.sql.extensions=org.apache.spark.sql.hudi.HoodieSparkSessionExtension" \
+--conf "spark.sql.catalog.spark_catalog=org.apache.spark.sql.hudi.catalog.HoodieCatalog"
+
+5.2 Running a Sample Hudi Job in Spark:
+
+Write Data to Hudi:
+import org.apache.hudi.DataSourceWriteOptions._
+import org.apache.hudi.config.HoodieWriteConfig._
+import org.apache.spark.sql.SaveMode._
+
+val dataGen = spark.range(0, 1000).toDF("id")
+dataGen.write.format("hudi")
+    .option(TABLE_NAME, "hudi_table")
+    .option(PRECOMBINE_FIELD.key(), "id")
+    .option(RECORDKEY_FIELD.key(), "id")
+    .option(PARTITIONPATH_FIELD.key(), "")
+    .option(OPERATION.key(), "insert")
+    .option(TABLE_TYPE.key(), "COPY_ON_WRITE")
+    .mode(Overwrite)
+    .save("/path/to/hudi-table")
+
+Read Hudi Data:
+val hudi_df = spark.read.format("hudi").load("/path/to/hudi-table/*")
+hudi_df.show()
+
+Step 6: Integrating Apache Hudi with Hive
+6.1 Enable Hive Sync for Hudi Tables:
+When writing data into a Hudi table using Spark, you can enable Hive sync:
+
+dataGen.write.format("hudi")
+    .option(TABLE_NAME, "hudi_table")
+    .option(PRECOMBINE_FIELD.key(), "id")
+    .option(RECORDKEY_FIELD.key(), "id")
+    .option(PARTITIONPATH_FIELD.key(), "")
+    .option(OPERATION.key(), "insert")
+    .option(TABLE_TYPE.key(), "COPY_ON_WRITE")
+    .option("hoodie.datasource.hive_sync.enable", "true")
+    .option("hoodie.datasource.hive_sync.database", "default")
+    .option("hoodie.datasource.hive_sync.table", "hudi_table")
+    .option("hoodie.datasource.hive_sync.jdbcurl", "jdbc:hive2://localhost:10000")
+    .option("hoodie.datasource.hive_sync.partition_fields", "date")
+    .mode(Overwrite)
+    .save("/path/to/hudi-table")
+
+6.2 Query Hudi Table from Hive:
+Start the Hive shell and run a query:
+hive
+SELECT * FROM hudi_table;
+
+
 
 
 

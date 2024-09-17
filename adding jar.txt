@@ -294,3 +294,12 @@ LOCATION 'file:///tmp/hudi_test_table';
 
 SELECT * FROM hudi_hive_table;
 
+
+hive> CREATE EXTERNAL TABLE hudi_hive_table(
+    >     id INT,
+    >     name STRING,
+    >     age INT
+    > )
+    > STORED BY 'org.apache.hudi.hadoop.HoodieParquetInputFormat'
+    > LOCATION 'file:///tmp/hudi_test_table';
+FAILED: Execution Error, return code 1 from org.apache.hadoop.hive.ql.exec.DDLTask. org.apache.hudi.hadoop.HoodieParquetInputFormat cannot be cast to org.apache.hadoop.hive.ql.metadata.HiveStorageHandler

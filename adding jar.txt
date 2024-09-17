@@ -284,13 +284,20 @@ df.write.format("hudi")
               --conf spark.sql.hive.convertMetastoreParquet=false
 
 
-CREATE EXTERNAL TABLE hudi_hive_table(
+CREATE EXTERNAL TABLE hudi_hive_table (
     id INT,
     name STRING,
     age INT
 )
-STORED BY 'org.apache.hudi.hadoop.HoodieParquetInputFormat'
-LOCATION 'file:///tmp/hudi_test_table';
+STORED BY 'org.apache.hudi.hadoop.HoodieHiveStorageHandler'
+LOCATION 'file:///tmp/hudi_test_table'
+TBLPROPERTIES (
+    'hoodie.datasource.write.recordkey.field'='id',
+    'hoodie.datasource.write.precombine.field'='age',
+    'hoodie.table.name'='hudi_test_table',
+    'hoodie.datasource.write.hive_style_partitioning'='true'
+);
+
 
 SELECT * FROM hudi_hive_table;
 

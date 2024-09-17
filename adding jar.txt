@@ -279,6 +279,6 @@ df.write.format("hudi")
 
 
 
-./spark-shell --jars /opt/hudi/hudi-spark3.2-bundle_2.12-0.10.1.jar \
+./spark-shell --jars /opt/hudi/hudi-spark3.1.2-bundle_2.12-0.10.1.jar \
               --conf spark.serializer=org.apache.spark.serializer.KryoSerializer \
               --conf spark.sql.hive.convertMetastoreParquet=false

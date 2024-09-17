@@ -47,3 +47,34 @@ df.write.format("hudi")
 
 
 spark-shell --conf "spark.executor.extraJavaOptions=-Dlog4j.configuration=file:/path/to/log4j.properties"
+
+
+
+
+
+from pyspark.sql import SparkSession
+
+spark = SparkSession.builder \
+    .appName("Hudi Test") \
+    .config("spark.serializer", "org.apache.spark.serializer.KryoSerializer") \
+    .config("spark.jars", "/opt/hudi/hudi-spark-bundle.jar") \
+    .getOrCreate()
+
+
+data = [(1, "Alice", "2023-09-17T12:00:00Z"), 
+        (2, "Bob", "2023-09-17T12:05:00Z")]
+
+df = spark.createDataFrame(data, ["id", "name", "ts"])
+
+
+df.write.format("hudi") \
+    .option("hoodie.table.name", "hudi_table") \
+    .option("hoodie.datasource.write.recordkey.field", "id") \
+    .option("hoodie.datasource.write.precombine.field", "ts") \
+    .mode("append") \
+    .save("hdfs://localhost:9000/user/hudi_table")
+
+
+USE hudi_test;
+SELECT * FROM hudi_table;
+

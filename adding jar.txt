@@ -1,0 +1,2 @@
+spark-shell --jars /path/to/hudi-spark-bundle.jar,/path/to/hive-exec.jar,/path/to/hadoop-common.jar \
+  --conf spark.serializer=org.apache.spark.serializer.KryoSerializer

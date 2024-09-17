@@ -84,9 +84,8 @@ SELECT * FROM hudi_table;
 
 
 import org.apache.spark.sql.SparkSession
-import org.apache.hudi.DataSourceWriteOptions._
-import org.apache.hudi.config.HoodieWriteConfig._
 import org.apache.spark.sql.SaveMode
+import org.apache.hudi.DataSourceWriteOptions // Import only DataSourceWriteOptions
 
 object HudiTest {
   def main(args: Array[String]): Unit = {
@@ -107,17 +106,18 @@ object HudiTest {
     // Create DataFrame
     val df = spark.createDataFrame(data).toDF("id", "name", "ts")
 
-    // Write Data to Hudi table
+    // Write Data to Hudi table with qualified references to avoid ambiguity
     df.write.format("hudi")
-      .option(TABLE_NAME, "hudi_table")
-      .option(RECORDKEY_FIELD_OPT_KEY, "id")
-      .option(PRECOMBINE_FIELD_OPT_KEY, "ts")
+      .option(DataSourceWriteOptions.TABLE_NAME, "hudi_table_test") // Qualified reference
+      .option(DataSourceWriteOptions.RECORDKEY_FIELD_OPT_KEY, "id") // Qualified reference
+      .option(DataSourceWriteOptions.PRECOMBINE_FIELD_OPT_KEY, "ts") // Qualified reference
       .mode(SaveMode.Append)
-      .save("hdfs://localhost:9000/user/hudi_table")
+      .save("hdfs://localhost:9000/user/hudi_table_test")
 
     // Stop the Spark session
     spark.stop()
   }
 }
+
 
 

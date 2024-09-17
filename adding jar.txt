@@ -297,6 +297,7 @@ TBLPROPERTIES (
     'hoodie.table.name'='hudi_test_table',
     'hoodie.datasource.write.hive_style_partitioning'='true'
 );
+export HADOOP_CLASSPATH=/opt/hudi/hudi-spark3.1.2-bundle_2.12-0.10.1.jar:$HADOOP_CLASSPATH
 
 
 SELECT * FROM hudi_hive_table;

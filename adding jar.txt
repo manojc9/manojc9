@@ -78,3 +78,46 @@ df.write.format("hudi") \
 USE hudi_test;
 SELECT * FROM hudi_table;
 
+
+
+
+
+
+import org.apache.spark.sql.SparkSession
+import org.apache.hudi.DataSourceWriteOptions._
+import org.apache.hudi.config.HoodieWriteConfig._
+import org.apache.spark.sql.SaveMode
+
+object HudiTest {
+  def main(args: Array[String]): Unit = {
+    
+    // Create Spark session
+    val spark = SparkSession.builder()
+      .appName("Hudi Test")
+      .config("spark.serializer", "org.apache.spark.serializer.KryoSerializer")
+      .config("spark.jars", "/opt/hudi/hudi-spark-bundle.jar")  // Specify Hudi jar
+      .getOrCreate()
+
+    // Sample data
+    val data = Seq(
+      (1, "Alice", "2023-09-17T12:00:00Z"),
+      (2, "Bob", "2023-09-17T12:05:00Z")
+    )
+
+    // Create DataFrame
+    val df = spark.createDataFrame(data).toDF("id", "name", "ts")
+
+    // Write Data to Hudi table
+    df.write.format("hudi")
+      .option(TABLE_NAME, "hudi_table")
+      .option(RECORDKEY_FIELD_OPT_KEY, "id")
+      .option(PRECOMBINE_FIELD_OPT_KEY, "ts")
+      .mode(SaveMode.Append)
+      .save("hdfs://localhost:9000/user/hudi_table")
+
+    // Stop the Spark session
+    spark.stop()
+  }
+}
+
+
